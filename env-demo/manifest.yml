@@ -1,0 +1,7 @@
+---
+applications:
+- name: env-demo
+  memory: 1G
+  instances: 2
+  path: ./cf-intro-environment-demo-0.0.1-SNAPSHOT.war
+  random-route: true

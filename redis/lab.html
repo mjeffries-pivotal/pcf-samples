@@ -1,0 +1,80 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Session Management</title><link rel="stylesheet" href="css/html.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.70.0"><link rel="start" href="index.html" title="Developing Applications with Cloud Foundry - Lab Documentation"><link rel="up" href="index.html" title="Developing Applications with Cloud Foundry - Lab Documentation"><link rel="prev" href="pcf-continuous-delivery-lab.html" title="Continuous Delivery"><link rel="next" href="pcf-java-apps-2-lab.html" title="Chapter&nbsp;15.&nbsp;Services and Environment in Java Applications"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="pcf-java-apps-1-lab"></a>Chapter&nbsp;14.&nbsp;Session Management</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="pcf-java-apps-1-lab-intro"></a>14.1.&nbsp;About this Lab</h2></div></div></div><p>In this lab you will learn how to enable an HTTP Session to survive instance failure</p><div class="itemizedlist"><p class="title"><b>Prerequisites</b></p><p>To complete these steps, you will need a Cloud Foundry account, the Cloud Foundry
+			student files, the CLoud Foundry CLI installed, and an IDE installed (with Cloud Foundry support).
+			If you are missing any of these return to the "Lab Setup" in the "Welcome, Agenda, and Setup" module
+			for instructions.
+		</p><ul type="disc"></ul></div><p>Estimated time to complete: 20 minutes</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="pcf-java-apps-1-lab-steps"></a>14.2.&nbsp;Steps</h2></div></div></div><p>
+			You will be given an application that uses the
+			<code class="code">HttpSession</code> which will lose information if restarted.
+			Then you will fix it in Cloud Foundry by adding a Redis session
+			replication service.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="pcf-java-apps-1-lab-deploy"></a>14.2.1.&nbsp;Push</h3></div></div></div><p>Locate the cf-session-management application and push it to Cloud Foundry.  You may use CLI or Eclipse.</p><div class="orderedlist"><ol type="1"><li><p>
+						If using the CLI, edit the <code class="filename">manifest.yml</code>and specify a unique
+						<code class="varname">host</code> (add your name or initials).
+					</p></li><li><p>
+						Once its running, go to its URL in the browser to see it
+						working. The application is very simple. Enter a name and
+						description (anything you like) and click "Submit".  The name and
+						description are displayed in the results page.
+					</p></li><li><p>
+						Refresh the page several times.  Notice that the values are retained.
+						You can examine the code if your are curious how the session is used.
+					</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="pcf-java-apps-1-lab-restart"></a>14.2.2.&nbsp;Restart Application</h3></div></div></div><div class="orderedlist"><ol type="1"><li><p>
+						Click on the "Stop!" link to kill the application (the code behind this actually
+						kills the JVM, simulating a real application crash).
+					</p></li><li><p>
+						Go back to the previous page in the browser and refresh that page.
+						You will get a CF error:
+					</p><p>
+						<code class="code">404 Not Found: Requested route
+							('cf-session-demo2.cfapps.io') does not exist.
+						</code>
+					</p></li><li><p>
+						Wait a moment for Cloud Foundry's Health Manager to notice the missing instance
+						and cause it to be restarted.  You can monitor the restart via the CLI, Eclipse
+						plugin, or Apps Manager if you like.</p></li><li><p>
+						Refresh the page again, note that the previously submitted data has been lost.
+						This is expected since the session data is stored in memory; it is lost when the
+						application instance stops.  In the next steps we will use a service to cause the
+						session data to be persisted external to the instance.
+					</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="pcf-java-apps-1-lab-bind"></a>14.2.3.&nbsp;Bind the Redis session-replication Service</h3></div></div></div><div class="orderedlist"><ol type="1"><li><p>
+						Using either the CLI, Apps Manager, or Eclipse, provision a new Redis service instance
+						<code class="literal">session-replication</code>.  You must use this name for the service instance
+						to obtain the desired session behavior.
+					</p><p>
+						If you are running on PWS the service is called
+						<code class="literal">rediscloud</code>.  Select the 25Mb plan (its free!).
+					</p></li><li><p>
+						Bind the service to the application.  You can do this via CLI, Apps Manager, or Eclipse.
+					</p></li><li><p>
+						Push the application to Cloud Foundry again.  Though the application code did not
+						change, we need to force the application to be restaged.  (If using Eclipse you can
+						use the "Update and Restart" button as a shortcut).
+					</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><th align="left">Note</th></tr><tr><td align="left" valign="top">
+					    You must run <code class="code">cf push</code> again or the new service will
+					    not be used.
+					</td></tr></table></div></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="pcf-java-apps-1-lab-retry"></a>14.2.4.&nbsp;Retry Killing the Application</h3></div></div></div><div class="orderedlist"><ol type="1"><li>
+					Return to your browser and check the application is
+					working again. Go to the Home page and re-enter some name and
+					description data.
+				</li><li><p>
+						Redo all the steps in <a href="pcf-java-apps-1-lab.html#pcf-java-apps-1-lab-restart" title="14.2.2.&nbsp;Restart Application">Section&nbsp;14.2.2, &#8220;Restart Application&#8221;</a>.  However,
+						this time the name and description should be retained by the Redis-backed session
+						even after the application instance has been stopped.
+					</p></li></ol></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="pcf-java-apps-1-lab-examine"></a>14.2.5.&nbsp;Examine the Application</h3></div></div></div><div class="orderedlist"><ol type="1"><li><p>If you have time, take a few minutes to examine the appliction code.
+					This is a Spring Boot application using Spring MVC Controllers.
+					You might like to look at the code to see how it works. In
+					particular: <code class="classname">FormController</code> and
+					<code class="classname">DisplayController</code>.  The <code class="classname">FormController</code>
+					loads values into the session and the <code class="classname">DisplayController</code> pulls
+					them out.
+					</p><p>
+					The Spring Boot initialization class is <code class="classname">Config</code>,
+					<code class="classname">Application</code> defines <code class="methodname">main()</code>
+					and	<code class="classname">WebApplication</code> allows this application to also run
+					as a WAR.
+					</p></li></ol></div></div><p>Congratulations, you have finished this exercise.</p></div></div></body></html>
+
+
+

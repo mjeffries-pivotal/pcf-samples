@@ -1,0 +1,8 @@
+---
+applications:
+- name: rabbitmq-node
+  memory: 256M
+  instances: 1
+  random-route: true
+  services:
+  - rabbitmq

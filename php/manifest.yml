@@ -1,0 +1,6 @@
+---
+applications:
+- name: php-app-mj
+  memory: 128M
+  random-route: true
+  

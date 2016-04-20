@@ -1,0 +1,5 @@
+---
+applications:
+- name: ruby-app
+  memory: 128M
+  random-route: true

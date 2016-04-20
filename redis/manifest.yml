@@ -1,0 +1,6 @@
+---
+applications:
+- name: redis-app
+  memory: 1G
+  path: ./cf-session-management-0.0.1-SNAPSHOT.war
+  random-route: true
