@@ -23,7 +23,12 @@ saying 'Hello World from port 61661!!'.  This app gets the container port the ap
 <li>Java Spring Music Application</li>
 <p>This is a Java app that displays a collection of albums.  It defaults to using an in-memory database.  To demo this app, just push the app as usual and bring up
   the URL in a browser.  Click on the "i" icon in the upper right corner of the app, it should say 'cloud, in-memory' next to 'profiles'.<p>
-  To use a MySQL database, just create a MySQL service instance (ex. cf create-service cleardb spark mydb), then bind it to your app
+  To use a MySQL database, just create a MySQL service instance (ex.
+    ```
+  cf login -a api.run.pivotal.io
+  cf create-service cleardb spark mydb
+    ```
+), then bind it to your app
   (ex. cf bind-service spring-music mydb) and restage the app (ex. cf restage spring-music).  Once the app is done staging and restarted, refresh the browser
   and click the "i" icon again.  It should now say 'cloud,mysql,mysql-cloud' next to 'profiles', and 'mydb' next to 'services'.  </p>
 <li>Java Environment Demo Application</li>
