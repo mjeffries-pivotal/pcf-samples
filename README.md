@@ -4,8 +4,8 @@
 To run these demos, you must have a Pivotal Cloud Foundry install available, with MySQL, RabbitMQ, and Redis installed.
 
 First you need to login to your environment from the CLI, for example
-- cf login -a api.run.pivotal.io  (or api.system.IP.xip.io when using xip.io, be sure to include the --skip-ssl-validation flag)
-- Enter userid when prompted   (can use "admin" for new installs)
+- cf login -a api.run.pivotal.io  (or api.systemdomain when using your own PCF environment, be sure to include the --skip-ssl-validation flag)
+- Enter userid when prompted   (can use "admin" for new PCF installs)
 - Enter password when prompted    (if using "admin" for userid, get password from Elastic Runtime credential page under UAA)
 - Select space when prompted
 
@@ -31,9 +31,9 @@ This is a Java app that displays a collection of albums.  It defaults to using a
     cf bind-service spring-music mydb
     ```
 ) and restage the app (ex.
-  ```
-  cf restage spring-music
-  ```
+    ```
+    cf restage spring-music
+    ```
 ).  Once the app is done staging and restarted, refresh the browser
   and click the "i" icon again.  It should now say 'cloud,mysql,mysql-cloud' next to 'profiles', and 'mydb' next to 'services'.
 
@@ -49,38 +49,38 @@ you should see the port and instance ID alternate again once the second app inst
 - ### RabbitMQ Application
 This is a NodeJS app that uses Rabbit MQ to store and retrieve messages.  This app requires you to create the rabbitmq service instance before you push
 the app.  So go ahead and create the service first (ex.
-  ```
-cf create-service cloudamqp lemur rabbitmq
-```
+    ```
+    cf create-service cloudamqp lemur rabbitmq
+    ```
 ), then push the app.  You don't need to bind it via
 the CLI because the binding is specified in the manifest.yml file.
 
 - To run the app, bring it up in a browser, and enter a few values in the input
 field, clicking the submit button each time.  The values you enter are sent to rabbitmq, then retrieved from rabbitmq and displayed.
+
 - ### Redis Application
 This is a Java app that demonstrates using Redis for session state.  You push the app as usual, then bring it up in a browser.  Enter a name and
 description, then click Submit.  You should see the values you entered, which are being stored in the app instance session, in-memory.  Click refresh a few
 times to demonstrate the value is stored in-memory.  Then right-click the 'Stop! link, and run it in a new tab.  
 
-- You should get an error in that tab since
-the application instance died.
+You should get an error in that tab since the application instance died.
 You can go back to your original tab, and hit refresh.  This page will also display an error, since we had only one
 application instance, and we just killed it.  Keep refreshing the page until the application instance is automatically recovered.  Once the app comes back,
-note that the values you entered are gone - because the session was stored in-memory in the application instance.  Now go to the CLI and create the redis service
-(ex. cf create-service rediscloud 30mb session-replication), and bind it to the app (ex.
-  ```
-cf bind-service redis-app session-replication
-```
-), and restage
-the app (ex.
-  ```
-cf restage redis-app
-```
+note that the values you entered are gone - because the session was stored in-memory in the application instance.  Now go to the CLI and create the redis service (ex.
+    ````
+    cf create-service rediscloud 30mb session-replication
+    ````
+), and bind it to the app (ex.
+    ```
+    cf bind-service redis-app session-replication
+    ```
+), and restage the app (ex.
+    ```
+    cf restage redis-app
+    ```
 ).  Once the app is staged and running, bring it up in the browser and repeat the steps above to create name and description
 and refresh the page.  The session data is now stored in redis, so it will survive after the application instance is killed.
-To demonstrate this, go ahead and kill
-the instance, wait for it to be automatically recovered, and refresh the page again.  You should see the name/description you entered.  
+To demonstrate this, go ahead and kill the instance, wait for it to be automatically recovered, and refresh the page again.  You should see the name/description you entered.  
 
-- Note that no code changes
-were needed.  The Java buildpack saw the 'sesssion-replication' service was bound to the app, and auto-magically reconfigured the session to use redis.  You must
-use the exact service instance name 'session-replication' for this to work, since that is how the  buildpack detects the redis service.
+Note that no code changes
+were needed.  The Java buildpack saw the 'sesssion-replication' service was bound to the app, and auto-magically reconfigured the session to use redis.  You must use the exact service instance name 'session-replication' for this to work, since that is how the  buildpack detects the redis service.
